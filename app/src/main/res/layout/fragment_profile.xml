@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".home.fragments.ProfileFragment">
+
+    <TextView
+        android:id="@+id/logOutTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/normal_spacing"
+        android:layout_marginTop="@dimen/normal_spacing"
+        android:layout_marginRight="@dimen/normal_spacing"
+        android:background="@drawable/box_shape_selected"
+        android:backgroundTint="#F1EEEE"
+        android:drawableRight="@drawable/ic_baseline_login_24"
+        android:drawableTint="@color/primaryColor"
+        android:padding="@dimen/normal_spacing"
+        android:text="Log Out"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+</LinearLayout>
