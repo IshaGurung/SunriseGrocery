@@ -1,8 +1,11 @@
 package com.ishagurung.sunrisegrocery.api;
 
+import com.ishagurung.sunrisegrocery.api.response.AddressResponse;
 import com.ishagurung.sunrisegrocery.api.response.AllProductResponse;
 import com.ishagurung.sunrisegrocery.api.response.CategoryResponse;
+import com.ishagurung.sunrisegrocery.api.response.DashResponse;
 import com.ishagurung.sunrisegrocery.api.response.LoginResponse;
+import com.ishagurung.sunrisegrocery.api.response.OrderHistoryResponse;
 import com.ishagurung.sunrisegrocery.api.response.RegisterResponse;
 import com.ishagurung.sunrisegrocery.api.response.SingleProductResponse;
 import com.ishagurung.sunrisegrocery.api.response.SliderResponse;
@@ -52,9 +55,53 @@ public interface ApiService {
             @Part("name") RequestBody name
 
     );
+    @FormUrlEncoded
+    @POST("/api/v1/cart")
+    Call<RegisterResponse> addToCart(@Header("Apikey") String apikey, @Field("p_id") int p, @Field("quantity") int q);
 
     @DELETE("/api/v1/category")
     Call<RegisterResponse> deleteCategory(@Header("Apikey") String apikey, @Query("c_id") int id);
+
+
+    @GET("/api/v1/cart")
+    Call<AllProductResponse> getMyCart(@Header("Apikey") String apikey);
+
+    @FormUrlEncoded
+    @POST("/api/v1/order")
+    Call<RegisterResponse> order(@Header("Apikey") String apikey,
+                                 @Field("p_type") int p_type,
+                                 @Field("address_id") int address_id,
+                                 @Field("payment_refrence") String paymentRefrence);
+
+    @GET("/api/v1/order")
+    Call<OrderHistoryResponse> orderHistory(@Header("Apikey") String apikey
+    );
+
+
+
+    @DELETE("/api/v1/cart")
+    Call<RegisterResponse> deleteFromCart(@Header("Apikey") String apikey, @Query("c_id") int cartID);
+
+
+
+
+    @GET("/api/v1/address")
+    Call<AddressResponse> getMyAddresses(@Header("Apikey") String apikey);
+
+    @FormUrlEncoded
+    @POST("/api/v1/address")
+    Call<RegisterResponse> addAddress(
+            @Header("Apikey") String apikey,
+            @Field("city") String city,
+            @Field("street") String street,
+            @Field("province") String province,
+            @Field("description") String description);
+
+
+    @GET("/api/v1/dash")
+    Call<DashResponse> getDash(@Header("Apikey") String apikey);
+
+
 
 
 }

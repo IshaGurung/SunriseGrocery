@@ -28,6 +28,8 @@ import com.ishagurung.sunrisegrocery.api.response.CategoryResponse;
 import com.ishagurung.sunrisegrocery.api.response.Product;
 import com.ishagurung.sunrisegrocery.api.response.Slider;
 import com.ishagurung.sunrisegrocery.api.response.SliderResponse;
+import com.ishagurung.sunrisegrocery.categoryAdapter.CategoryActivity;
+import com.ishagurung.sunrisegrocery.home.fragments.home.adapters.Adapter;
 import com.ishagurung.sunrisegrocery.home.fragments.home.adapters.CategoryAdapter;
 import com.ishagurung.sunrisegrocery.home.fragments.home.adapters.ShopAdapter;
 import com.ishagurung.sunrisegrocery.home.fragments.home.adapters.SliderAdapter;
@@ -45,20 +47,36 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
-
-    SliderView imageSlider;
     RecyclerView allProductRV, categoryRV;
     ProgressBar loadingProgress;
+    SliderView imageSlider;
     TextView viewAllTV;
-    LinearLayout searchLL;
+   LinearLayout searchLL;
+    List<Product> productList = new ArrayList<>();
     BottomNavigationView bottomNavigationView;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    List<Product> productDataList;
+    private Adapter adapter;
+    ProgressBar progressBar;
+    TextView search;
+    String[] item;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
+
+    public void setBottomNavigationView(BottomNavigationView bottomNavigationView) {
+        this.bottomNavigationView = bottomNavigationView;
+    }
+
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -66,9 +84,29 @@ public class HomeFragment extends Fragment {
         categoryRV = view.findViewById(R.id.categoryRV);
         loadingProgress = view.findViewById(R.id.loadingProgress);
         imageSlider = view.findViewById(R.id.imageSlider);
+        viewAllTV = view.findViewById(R.id.viewAllTV);
+        searchLL = view.findViewById(R.id.searchLL);
         serverCall();
         getCategoriesOnline();
         getSliders();
+        setClickListeners();
+
+    }
+
+    private void setClickListeners() {
+        viewAllTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomNavigationView.setSelectedItemId(R.id.catMenu);
+            }
+        });
+        searchLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
     }
 
     private void getSliders() {
@@ -90,12 +128,25 @@ public class HomeFragment extends Fragment {
         });
     }
 
+
     private void setSliders(List<Slider> sliders) {
         SliderAdapter sliderAdapter = new SliderAdapter(sliders, getContext(), true);
         sliderAdapter.setClickLister(new SliderAdapter.OnSliderClickLister() {
             @Override
             public void onSliderClick(int position, Slider slider) {
-                Toast.makeText(getContext(), "from home This is item in position " + position, Toast.LENGTH_SHORT).show();
+
+                if (slider.getType() == 1) {
+                    Intent intent = new Intent(getContext(), SingleProductActivity.class);
+                    intent.putExtra(SingleProductActivity.SINGLE_DATA_KEY, slider.getRelatedId());
+                    getContext().startActivity(intent);
+                } else if (slider.getType() == 2) {
+                    Intent cat = new Intent(getContext(), CategoryActivity.class);
+                    Category category = new Category();
+                    category.setId(slider.getRelatedId());
+                    category.setName(slider.getDesc());
+                    cat.putExtra(CategoryActivity.CATEGORY_DATA_KEY, category);
+                    getContext().startActivity(cat);
+                }
             }
         });
         imageSlider.setSliderAdapter(sliderAdapter);
@@ -146,7 +197,6 @@ public class HomeFragment extends Fragment {
         categoryRV.setAdapter(categoryAdapter);
 
     }
-
     private void serverCall() {
         toggleLoading(true);
         Call<AllProductResponse> allProductResponseCall = ApiClient.getClient().getAllProducts();
@@ -154,7 +204,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(Call<AllProductResponse> call, Response<AllProductResponse> response) {
                 toggleLoading(false);
-              
+                setProdctRecyclerView(response.body().getProducts());
 
             }
 
@@ -171,9 +221,10 @@ public class HomeFragment extends Fragment {
         allProductRV.setHasFixedSize(true);
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
         allProductRV.setLayoutManager(layoutManager);
-        ShopAdapter shopAdapter = new ShopAdapter(products, getContext(),false);
+        ShopAdapter shopAdapter = new ShopAdapter(products, getContext(), false);
         allProductRV.setAdapter(shopAdapter);
     }
+
 
     void toggleLoading(boolean toggle) {
         if (toggle)

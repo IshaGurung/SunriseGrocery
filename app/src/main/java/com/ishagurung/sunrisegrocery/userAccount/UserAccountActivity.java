@@ -43,9 +43,10 @@ public class UserAccountActivity extends AppCompatActivity implements View.OnCli
         if (!isRegister) {
             register.setText("Login");
             signUpRegister.setText("Already Have an Account? ");
-        } else {
+        }
+        else {
             register.setText("Register");
-            signUpRegister.setText("New to Appcommerce? ");
+            signUpRegister.setText("New to Sunrise Grocery? ");
         }
     }
 }

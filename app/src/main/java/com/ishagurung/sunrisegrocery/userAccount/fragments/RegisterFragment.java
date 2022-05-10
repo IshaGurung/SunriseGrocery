@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.ishagurung.sunrisegrocery.R;
@@ -25,6 +26,7 @@ import retrofit2.Response;
 public class RegisterFragment extends Fragment {
     EditText emailEditText, nameEditText, passwordEditText, confirmPasswordEditText;
     Button registerBtn;
+    ProgressBar circularProgress;
 
 
     @Override
@@ -42,16 +44,19 @@ public class RegisterFragment extends Fragment {
         nameEditText = view.findViewById(R.id.nameEditText);
         passwordEditText = view.findViewById(R.id.passwordEditText);
         confirmPasswordEditText = view.findViewById(R.id.confirmPasswordEditText);
+        circularProgress = view.findViewById(R.id.circularProgress);
         registerBtn = view.findViewById(R.id.registerBtn);
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (validate()) {
+                    toggleLoading(true);
                     Call<RegisterResponse> registerCall = ApiClient.getClient().register(nameEditText.getText().toString(), emailEditText.getText().toString(), passwordEditText.getText().toString());
                     registerCall.enqueue(new Callback<RegisterResponse>() {
                         @Override
                         public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                             RegisterResponse registerResponse = response.body();
+                            toggleLoading(false);
                             if (response.isSuccessful()) {
                                 Toast.makeText(getActivity(), registerResponse.getMessage(), Toast.LENGTH_SHORT).show();
                                 if (!registerResponse.getError()) {
@@ -63,6 +68,7 @@ public class RegisterFragment extends Fragment {
 
                         @Override
                         public void onFailure(Call<RegisterResponse> call, Throwable t) {
+                            toggleLoading(false);
                             Toast.makeText(getActivity(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -72,7 +78,12 @@ public class RegisterFragment extends Fragment {
         });
 
     }
-
+    void toggleLoading(Boolean toogle) {
+        if (toogle)
+            circularProgress.setVisibility(View.VISIBLE);
+        else
+            circularProgress.setVisibility(View.GONE);
+    }
 
     public boolean validate() {
         boolean validate = true;
